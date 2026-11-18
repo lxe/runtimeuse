@@ -7,7 +7,7 @@ import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
 
 ## 1. Start the Runtime
 
-<Tabs items={["Local", "E2B", "Daytona", "Vercel", "Modal"]}>
+<Tabs items={["Local", "E2B", "Daytona", "Vercel", "Modal", "Orble"]}>
   <Tab>
     ```bash
     npm install -g @anthropic-ai/claude-code
@@ -175,6 +175,37 @@ import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
     ```
 
     Full example: [examples/modal-quickstart.py](https://github.com/getlark/runtimeuse/blob/main/examples/modal-quickstart.py)
+  </Tab>
+  <Tab>
+    ```bash
+    pip install e2b
+    ```
+
+    ```python
+    # Required env vars: E2B_API_KEY (your Orble API key), E2B_DOMAIN=orble.tech, ANTHROPIC_API_KEY
+    # Orble speaks the E2B API; its default template has Node.js, Claude Code and Docker.
+    # Public ports, which the client connects through, need an account that has added credit.
+    from e2b import Sandbox
+
+    sandbox = Sandbox.create(timeout=600)
+    sandbox.commands.run(
+        "npx -y runtimeuse@latest --agent claude",
+        background=True,
+        envs={
+            "ANTHROPIC_API_KEY": anthropic_api_key,
+            "IS_SANDBOX": "1",
+            "CLAUDE_SKIP_ROOT_CHECK": "1",
+        },
+    )
+    sandbox.commands.run(
+        "timeout 120 sh -c 'until curl -s -o /dev/null localhost:8080; do sleep 1; done'",
+        timeout=130,
+    )
+
+    ws_url = f"wss://{sandbox.get_host(8080)}"
+    ```
+
+    Full example: [examples/orble-quickstart.py](https://github.com/getlark/runtimeuse/blob/main/examples/orble-quickstart.py)
   </Tab>
 </Tabs>
 
